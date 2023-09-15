@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ConectDevice">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="6dp"
+        android:layout_marginBottom="12dp"
+        android:stretchColumns="*">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/connectDevice_btnSearch"
+                android:layout_column="0"
+                android:text="Buscar dispositivos" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/connectDevice_btnIsConected"
+                android:layout_column="1"
+                android:text="Esta conectado?" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/connectDevice_btnConnect"
+                android:layout_column="0"
+                android:text="Conectar" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/connectDevice_btnDisconnect"
+                android:layout_column="1"
+                android:text="Desconectar" />
+        </TableRow>
+
+    </TableLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
