@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/connect_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="Conectar Dispositivo" />
+    <item
+        android:id="@+id/manual_commands"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="Comandos Manuales" />
+    <item
+        android:id="@+id/read_ntag424"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="Conexion NTag" />
+</menu>
