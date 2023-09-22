@@ -3,49 +3,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_column="0"
     android:orientation="vertical"
     tools:context=".ConectDevice">
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="6dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
+        android:padding="6dp"
         android:stretchColumns="*">
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:padding="6dp">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="163dp"
+                android:layout_height="wrap_content"
+                android:text="Estas conectado a:"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/deviceInfo_Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:textColor="#90E0EF"
+                android:textSize="16sp"
+                android:textStyle="italic" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="4dp">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/connectDevice_btnSearch"
                 android:layout_column="0"
-                android:text="Buscar dispositivos" />
+                android:text="Buscar dispositivos"
+                android:background="#00B4D8"
+                android:layout_marginEnd="4dp"
+                android:textColor="@color/white"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/connectDevice_btnIsConected"
                 android:layout_column="1"
-                android:text="Esta conectado?" />
+                android:text="Esta conectado?"
+                android:background="#CAF0F8"
+                android:layout_marginEnd="4dp"
+                android:textColor="#03045E"/>
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/connectDevice_btnConnect"
                 android:layout_column="0"
-                android:text="Conectar" />
+                android:text="Conectar"
+                android:background="#0077B6"
+                android:layout_marginEnd="4dp"
+                android:textColor="@color/white"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/connectDevice_btnDisconnect"
                 android:layout_column="1"
-                android:text="Desconectar" />
+                android:text="Desconectar"
+                android:background="#03045E"
+                android:layout_marginEnd="4dp"
+                android:textColor="@color/white"/>
         </TableRow>
 
     </TableLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/device_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        tools:listitem="@layout/bluetooth_device" />
 
 </LinearLayout>

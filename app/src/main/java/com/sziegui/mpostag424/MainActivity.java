@@ -17,10 +17,13 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.mf.mpos.pub.CommEnum;
+import com.mf.mpos.pub.Controler;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_BLUETOOTH_PERMISSION = 117;
     private static final int REQUEST_BLUETOOTH_ENABLE = 234;
+    private BluetoothAdapter btAdapter;
     private BottomNavigationView bottomNavigationView;
 
     private ConectDevice connect;
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         commands = new ManualCommands();
         card = new GetCardData();
         setFragment(connect);
+        Controler.Init(this, CommEnum.CONNECTMODE.BLUETOOTH);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -51,31 +55,22 @@ public class MainActivity extends AppCompatActivity {
                     return false;
             }
         });
-        if (checkBluetoothPermission()) {
-            // Permisos concedidos, continuar con la lógica de Bluetooth
-            enableBluetooth();
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        // Pedir permiso de Bluetooth si es necesario
+        if (btAdapter == null || !btAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_BLUETOOTH_ENABLE);
         } else {
-            // Solicitar permisos de Bluetooth
-            requestBluetoothPermission();
-        }
-    }
-    private boolean checkBluetoothPermission() {
-        // Verificar si se tienen los permisos de Bluetooth
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        } else {
-            return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            Toast.makeText(this, "Ya esta activado el blutu", Toast.LENGTH_SHORT).show();
+            // Bluetooth ya está activado
         }
     }
 
-    private void requestBluetoothPermission() {
-        // Solicitar permisos de Bluetooth
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_BLUETOOTH_PERMISSION);
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_BLUETOOTH_PERMISSION);
-        }
+    @Override
+    protected void onDestroy() {
+        Controler.Destory();
+        super.onDestroy();
     }
 
     private void enableBluetooth() {
@@ -85,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
             // El Bluetooth no está activado, solicitar activación
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, REQUEST_BLUETOOTH_ENABLE);
-        } else {
-            // El Bluetooth está activado, continuar con la lógica de Bluetooth
-            // ...
         }
     }
     private void setFragment(Fragment fragment) {

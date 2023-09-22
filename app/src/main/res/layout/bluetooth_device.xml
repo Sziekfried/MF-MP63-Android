@@ -3,6 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
     android:layout_height="wrap_content">
 
     <ImageView
@@ -16,10 +20,10 @@
 
     <TextView
         android:id="@+id/device_name"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_marginStart="12dp"
+        android:layout_toStartOf="@+id/check_selectDevice"
         android:layout_toEndOf="@+id/imageView"
         android:text="TextView" />
 
@@ -28,9 +32,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/device_name"
-        android:layout_alignParentEnd="true"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_toStartOf="@+id/check_selectDevice"
         android:layout_toEndOf="@+id/imageView"
         android:text="TextView" />
+
+    <CheckBox
+        android:id="@+id/device_isSelected"
+        android:layout_width="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp" />
 </RelativeLayout>
