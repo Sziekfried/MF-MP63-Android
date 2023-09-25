@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.mf.mpos.pub.CommEnum;
 import com.mf.mpos.pub.Controler;
 
@@ -25,8 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_BLUETOOTH_ENABLE = 234;
     private BluetoothAdapter btAdapter;
     private BottomNavigationView bottomNavigationView;
-
-    private ConectDevice connect;
+    private ConectDevice connect; 
     private ManualCommands commands;
     private GetCardData card;
     @Override
@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         card = new GetCardData();
         setFragment(connect);
         Controler.Init(this, CommEnum.CONNECTMODE.BLUETOOTH);
-
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        checkBluetoothPermissions();
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.connect_menu:
@@ -55,16 +56,7 @@ public class MainActivity extends AppCompatActivity {
                     return false;
             }
         });
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        // Pedir permiso de Bluetooth si es necesario
-        if (btAdapter == null || !btAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_BLUETOOTH_ENABLE);
-        } else {
-            Toast.makeText(this, "Ya esta activado el blutu", Toast.LENGTH_SHORT).show();
-            // Bluetooth ya está activado
-        }
     }
 
     @Override
@@ -74,9 +66,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enableBluetooth() {
-        // Verificar si el Bluetooth está activado
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+        if (btAdapter == null || !btAdapter.isEnabled()) {
             // El Bluetooth no está activado, solicitar activación
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, REQUEST_BLUETOOTH_ENABLE);
@@ -89,25 +79,48 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_BLUETOOTH_PERMISSION) {
-            // Verificar si los permisos de Bluetooth fueron concedidos
-            boolean permissionGranted = true;
+            boolean allPermissionsGranted = true;
             for (int grantResult : grantResults) {
                 if (grantResult != PackageManager.PERMISSION_GRANTED) {
-                    permissionGranted = false;
+                    allPermissionsGranted = false;
                     break;
                 }
             }
 
-            if (permissionGranted) {
-                // Permisos concedidos, continuar con la lógica de Bluetooth
-                enableBluetooth();
+            if (allPermissionsGranted) {
+                // Los permisos fueron concedidos, puedes proceder con las operaciones de Bluetooth
+                Snackbar.make(findViewById(android.R.id.content), "Ahora si, ya tengo los permisos necesarios", Snackbar.LENGTH_SHORT).show();
             } else {
-                // Permisos no concedidos, mostrar un mensaje de error o tomar alguna acción
+                // Los permisos no fueron concedidos, muestra un mensaje al usuario o toma una acción adecuada
+                // Puedes mostrar un Snackbar o un Toast aquí
                 Toast.makeText(this, "Los permisos de Bluetooth no fueron concedidos.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private void checkBluetoothPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Verificar si los permisos ya están concedidos
+            if (checkSelfPermission(android.Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(android.Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                // Si los permisos no están concedidos, solicitarlos al usuario
+                requestPermissions(new String[]{
+                        android.Manifest.permission.BLUETOOTH,
+                        android.Manifest.permission.BLUETOOTH_ADMIN,
+                        android.Manifest.permission.BLUETOOTH_CONNECT,
+                        android.Manifest.permission.BLUETOOTH_SCAN,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                }, REQUEST_BLUETOOTH_PERMISSION);
+            } else {
+                // Los permisos ya están concedidos, puedes proceder con las operaciones de Bluetooth
+                Snackbar.make(findViewById(android.R.id.content), "Ya tengo los permisos necesarios", Snackbar.LENGTH_SHORT).show();
             }
         }
     }
@@ -115,13 +128,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == REQUEST_BLUETOOTH_ENABLE) {
             // Verificar si el Bluetooth fue activado por el usuario
-            if (resultCode == RESULT_OK) {
-                // El Bluetooth fue activado, continuar con la lógica de Bluetooth
-                // ...
-            } else {
+            if (resultCode != RESULT_OK) {
                 // El Bluetooth no fue activado, mostrar un mensaje de error o tomar alguna acción
                 Toast.makeText(this, "El Bluetooth no fue activado.", Toast.LENGTH_SHORT).show();
             }

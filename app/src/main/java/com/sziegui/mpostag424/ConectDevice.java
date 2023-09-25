@@ -58,7 +58,6 @@ public class ConectDevice extends Fragment {
         super.onCreate(savedInstanceState);
         deviceList = new ArrayList<>();
         adaptador = new BluetoothDeviceAdapter(deviceList);
-        checkBluetoothPermission();
         verifyMposConnected();
     }
 
@@ -71,8 +70,8 @@ public class ConectDevice extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        checkBluetoothPermission();
         verifyMposConnected();
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     @Override
@@ -108,7 +107,6 @@ public class ConectDevice extends Fragment {
                 Toast.makeText(requireContext(), "Aun no te has conectado a ningun dispositivo", Toast.LENGTH_SHORT).show();
             }
         });
-        btAdapter.enable();
         // Registrar el receptor de difusión para recibir los dispositivos Bluetooth encontrados
         IntentFilter filter = new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_FOUND);
         requireActivity().registerReceiver(bluetoothReceiver, filter);
@@ -149,7 +147,10 @@ public class ConectDevice extends Fragment {
                 ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_SCAN)
                         != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.BLUETOOTH_SCAN, android.Manifest.permission.BLUETOOTH_CONNECT},
+                    new String[]{
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.BLUETOOTH_SCAN,
+                            android.Manifest.permission.BLUETOOTH_CONNECT},
                     REQUEST_LOCATION_PERMISSION);
         } else {
             enableBluetooth();
