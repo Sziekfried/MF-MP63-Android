@@ -162,7 +162,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="4dp">
             <androidx.appcompat.widget.AppCompatTextView
-                id="@+id/txtShowTagUID"
+                android:id="@+id/txtShowTagUID"
                 android:layout_column="1"
                 android:textStyle="italic"
                 android:textColor="#03045E"
@@ -179,6 +179,31 @@
                 android:paddingEnd="12dp"
                 android:layout_marginStart="4dp"
                 android:text="Obtener UID"
+                android:textColor="@color/white"
+                android:textSize="11sp" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="4dp">
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtShowTagAuthResult"
+                android:layout_column="1"
+                android:textStyle="italic"
+                android:textColor="#03045E"
+                />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnTryAuth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:background="#0096C7"
+                android:minHeight="32dip"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginStart="4dp"
+                android:text="Iniciar Autenticación"
                 android:textColor="@color/white"
                 android:textSize="11sp" />
         </TableRow>

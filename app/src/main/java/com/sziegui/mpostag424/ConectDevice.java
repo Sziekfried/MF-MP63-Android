@@ -1,5 +1,6 @@
 package com.sziegui.mpostag424;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,14 +27,17 @@ import com.mf.mpos.pub.Controler;
 import com.mf.mpos.pub.result.ConnectPosResult;
 import com.sziegui.mpostag424.Adapters.BluetoothDeviceAdapter;
 import com.sziegui.mpostag424.Models.Communication.BluetoothDevice;
+import com.sziegui.mpostag424.Utils.UtilsUi;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class ConectDevice extends Fragment {
+    private UtilsUi uiUtils;
     private Button btnSearchDevices, btnConnectDevice, btnDisconnectDevice, btnIsConnected;
     private TextView txtConnectedDeviceName;
+    private ProgressDialog pBar;
     private RecyclerView deviceListView;
     private BluetoothDeviceAdapter adaptador;
     String bluetoothMac = "";
@@ -59,6 +64,7 @@ public class ConectDevice extends Fragment {
         deviceList = new ArrayList<>();
         adaptador = new BluetoothDeviceAdapter(deviceList);
         verifyMposConnected();
+        uiUtils = UtilsUi.getInstance(getContext());
     }
 
     private void verifyMposConnected() {
@@ -115,6 +121,7 @@ public class ConectDevice extends Fragment {
     }
 
     private void connectDevice() {
+        showProgressDialog(requireContext());
         if (adaptador.getSelected() >= 0) {
             BluetoothManager bluetoothManager = (BluetoothManager) requireActivity().getSystemService(Context.BLUETOOTH_SERVICE);
             bluetoothManager.getAdapter().cancelDiscovery();
@@ -130,14 +137,17 @@ public class ConectDevice extends Fragment {
             }
             ConnectPosResult ret = Controler.connectPos(bluetoothMac);
             if (ret.bConnected) {
+
                 requireActivity().runOnUiThread(() -> {
                     txtConnectedDeviceName.setText(bluetoothName);
                     MyApplication.setBluetoothMac(bluetoothMac);
                     MyApplication.setBluetoothName(bluetoothName);
+                    hideProgressDialog();
                 });
             } else {
-                requireActivity().runOnUiThread(() -> Toast.makeText(getContext(), "No se logro conectar al dispositivo", Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(this::hideProgressDialog);
             }
+
         }).start();
     }
 
@@ -196,14 +206,13 @@ public class ConectDevice extends Fragment {
     private void scanBluetoothDevices() {
         deviceList.clear();
         adaptador.notifyDataSetChanged();
-
         if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(requireContext(), "No tengo permiso pa escanear", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "No tengo permisos suficientes.", Toast.LENGTH_SHORT).show();
             return;
         }
         btAdapter.cancelDiscovery();
         btAdapter.startDiscovery();
-        Toast.makeText(getContext(), "Discovering nearby Bluetooth devices...", Toast.LENGTH_SHORT).show();
+        uiUtils.showSnackbarMsg(requireView(), "Buscando dispositivos cercanos");
     }
 
     // Receptor de difusión para recibir los dispositivos Bluetooth encontrados
@@ -226,5 +235,20 @@ public class ConectDevice extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         btAdapter.cancelDiscovery();
+    }
+    private void showProgressDialog(Context ctx) {
+        pBar = new ProgressDialog(ctx);
+        pBar.setIndeterminate(true);
+        pBar.setTitle("Conectando vía bluetooth");
+        pBar.setCancelable(false);
+        pBar.setContentView(R.layout.custom_progress_dialog);
+        pBar.show();
+    }
+
+    // Ocultar el ProgressDialog
+    private void hideProgressDialog() {
+        if (pBar != null && pBar.isShowing()) {
+            pBar.dismiss();
+        }
     }
 }
