@@ -1,5 +1,6 @@
 package com.sziegui.mpostag424;
 
+import static com.sziegui.mpostag424.Utils.Constants.KEY04_TAG_JOSE;
 import static com.sziegui.mpostag424.Utils.Constants.TAG_APDU_GET_UID;
 import static com.sziegui.mpostag424.Utils.TagUtils.APDU_CMD_ISO_SELECT;
 import static com.sziegui.mpostag424.Utils.TagUtils.APDU_CMD_START_AUTH;
@@ -26,6 +27,8 @@ import com.mf.mpos.util.Misc;
 import com.sziegui.mpostag424.Utils.TagUtils;
 import com.sziegui.mpostag424.Utils.UtilsUi;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,10 +39,11 @@ public class ManualCommands extends Fragment {
     private final byte CARD_RF = 0x02;
     private final byte CARD_POWER_ON = 0x01;
     private final byte CARD_POWER_OFF = 0x02;
-    private Button btnShowMessage, btnInitComm, btnEndComm, btnSendHexCommand, btnGetTagUID, btnTryAuth;
-    private TextView txtShowMPOSResponse, txtShowMPOSName, txtShowTagUID, txtShowAuthResult;
+    private Button btnShowMessage, btnInitComm, btnEndComm, btnSendHexCommand, btnGetTagUID, btnTryAuth, btnReadFile;
+    private TextView txtShowMPOSResponse, txtShowMPOSName, txtShowTagUID, txtShowAuthResult, txtShowTagFileData;
     private EditText txtInputMessage, txtInputCommand;
     private UtilsUi uiUtils;
+    private TagUtils tag424 = null;
     private ProgressDialog progressDialog;
     private List<byte[]> APDU_UID_COMMANDS = new ArrayList<byte[]>() {
         {
@@ -97,11 +101,13 @@ public class ManualCommands extends Fragment {
         btnSendHexCommand = v.findViewById(R.id.btnSetCommandMPOS);
         btnGetTagUID = v.findViewById(R.id.btnGetTagUID);
         btnTryAuth = v.findViewById(R.id.btnTryAuth);
+        btnReadFile = v.findViewById(R.id.btnReadFileData);
 
         txtShowMPOSResponse = v.findViewById(R.id.txtShowResponse);
         txtShowMPOSName = v.findViewById(R.id.txtMposName);
         txtShowTagUID = v.findViewById(R.id.txtShowTagUID);
         txtShowAuthResult = v.findViewById(R.id.txtShowTagAuthResult);
+        txtShowTagFileData = v.findViewById(R.id.txtShowTagFileData);
 
         txtInputMessage = v.findViewById(R.id.txtMsgToMPOS);
         txtInputCommand = v.findViewById(R.id.txtCommandToMPOS);
@@ -146,6 +152,16 @@ public class ManualCommands extends Fragment {
             uiUtils.showToastMsg("Recuerda mantener la tarjeta pegada al MPOS");
             tryAuthenticateTransaction();
         });
+
+        btnReadFile.setOnClickListener(v1 -> {
+            if(tag424 == null){
+                uiUtils.showToastMsg("Primero debes realizar la autenticacion antes de leer el contenido del tag");
+                return;
+            }
+            if (!Controler.posConnected()) return;
+            uiUtils.showToastMsg("Recuerda mantener la tarjeta pegada al MPOS");
+            readTagFileData((byte) 0x03);
+        });
     }
 
     private void getUIDTag() {
@@ -189,25 +205,25 @@ public class ManualCommands extends Fragment {
     }
 
     private void tryAuthenticateTransaction() {
-        TagUtils tUtils = new TagUtils(DEFAULT_424TAG_KEY);
         if (Controler.ic_ctrl(CARD_RF, CARD_POWER_ON) != null) {
-            tUtils.printLogTagCommand("Comunicacion iniciada");
+        tag424 = new TagUtils(KEY04_TAG_JOSE);
+            tag424.printLogTagCommand("Comunicacion iniciada");
             try {
                 byte[] response = Controler.ic_cmd(CARD_RF, APDU_CMD_ISO_SELECT);
                 if (Misc.hex2asc(response).endsWith("9000")) {
-                    tUtils.printLogTagCommand("ISO Select DF Application Name Succesfull");
-                    response = Controler.ic_cmd(CARD_RF, APDU_CMD_START_AUTH);
+                    tag424.printLogTagCommand("ISO Select DF Application Name Succesfull");
+                    response = Controler.ic_cmd(CARD_RF, getCommandToInitAuth((byte) 0x04, APDU_CMD_START_AUTH));
                     if (Misc.hex2asc(response).endsWith("91AF")) {
-                        tUtils.printLogTagCommand("First auth command executed\n response: " + Misc.hex2asc(response));
+                        tag424.printLogTagCommand("First auth command executed\n response: " + Misc.hex2asc(response));
                         byte[] encriptedRandomBShifted = Arrays.copyOfRange(response, 0, 16);
-                        byte[] data = tUtils.getFirstPCDStepData(encriptedRandomBShifted);
-                        byte[] secondCommand = tUtils.getCommandForStepTwo(data);
-                        tUtils.printLogTagCommand("Second Auth Command: " + Misc.hex2asc(secondCommand));
+                        byte[] data = tag424.getFirstPCDStepData(encriptedRandomBShifted);
+                        byte[] secondCommand = tag424.getCommandForStepTwo(data);
+                        tag424.printLogTagCommand("Second Auth Command: " + Misc.hex2asc(secondCommand));
                         response = Controler.ic_cmd(CARD_RF, secondCommand);
                         if(Misc.hex2asc(response).endsWith("9100")){
-                            tUtils.printLogTagCommand("Te autenticaste correctamente:");
-                            tUtils.printLogTagCommand("La respuesta final fue: " + Misc.hex2asc(response));
-                            tUtils.execSecondPCDStep(response);
+                            tag424.printLogTagCommand("Te autenticaste correctamente:");
+                            tag424.printLogTagCommand("La respuesta final fue: " + Misc.hex2asc(response));
+                            tag424.execSecondPCDStep(response);
                             txtShowAuthResult.setText("Autenticacion completa");
                         }else{
                             throw new RuntimeException("La respuesta en la segunda parte de la solicitud de autenticacion: " + Misc.hex2asc(response));
@@ -219,6 +235,8 @@ public class ManualCommands extends Fragment {
                     throw new RuntimeException("La respuesta en la seleccion del DF AppName: " + Misc.hex2asc(response));
                 }
             } catch (Exception e) {
+                tag424.printLogTagCommand("Comunicacion finalizada");
+                tag424 = null;
                 e.printStackTrace();
                 String result = Controler.ic_ctrl(CARD_RF, CARD_POWER_OFF);
                 uiUtils.showSnackbarMsg(requireView(), result != null ? "Se ha terminado la comunicacion inesperadamente vuelve a intentar" : "Error vuelve a intentar");
@@ -226,8 +244,41 @@ public class ManualCommands extends Fragment {
             }
         } else {
             uiUtils.showToastMsg("Acerca la tarjeta para iniciar la comunicacion");
-
         }
+    }
+
+    private byte[] getCommandToInitAuth(byte noKey, byte[] commandModel) {
+        commandModel[5] = noKey;
+        return commandModel;
+    }
+    private void readTagFileData(byte fileNo) {
+        byte[] commandToRead = tag424.getReadFileDataFirstCommand(fileNo);
+        byte[] response = Controler.ic_cmd(CARD_RF, commandToRead);
+        if (Misc.hex2asc(response).endsWith("9100")) {
+            tag424.processReadDataResponse(Arrays.copyOfRange(response, 0, response.length - 2));
+        }else{
+            tag424.printLogTagCommand("respuesta erronea: " + Misc.hex2asc(response));
+            uiUtils.showToastMsg("Error al leer el contenido del tag");
+        }
+        /*
+        if (Controler.ic_ctrl(CARD_RF, CARD_POWER_ON) != null) {
+            byte[] commandToRead = tag424.getReadFileDataFirstCommand(fileNo);
+            byte[] response = Controler.ic_cmd(CARD_RF, commandToRead);
+            if (Misc.hex2asc(response).endsWith("9100")) {
+                tag424.processReadDataResponse(Arrays.copyOfRange(response, 0, response.length - 2));
+            }else{
+                tag424.printLogTagCommand("respuesta erronea: " + Misc.hex2asc(response));
+                uiUtils.showToastMsg("Error al leer el contenido del tag");
+            }
+        }else {
+            uiUtils.showToastMsg("Acerca la tarjeta para iniciar la comunicacion");
+        }
+        */
+    }
+    private void getTag03FileSettings(){
+        byte[] command = new byte[]{
+                (byte) 0x90, (byte) 0xF5, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x03, (byte) 0x00
+        };
     }
 
     private void showResultUID(String UID) {
@@ -254,15 +305,6 @@ public class ManualCommands extends Fragment {
                 Controler.screen_show(msg, 30, false, true);
             }
         }).start();
-    }
-
-    private byte[] createRandomByteHexArray(int size) {
-        byte[] result = new byte[size];
-        Random random = new Random();
-        for (int i = 0; i <= size; i++) {
-            result[i] = (byte) (random.nextInt(255));
-        }
-        return result;
     }
 
     @Override

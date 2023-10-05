@@ -6,7 +6,6 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class UtilsUi {
     private static UtilsUi instance;
