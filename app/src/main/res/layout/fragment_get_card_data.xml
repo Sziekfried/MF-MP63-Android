@@ -1,18 +1,280 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".GetCardData">
-
-    <!-- TODO: Update blank fragment layout -->
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/lyt_titleContainer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="4dp"
-        android:text="Aqui va todo el proceso de la comunicacion de la tarjeta"
-        android:textSize="18sp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-</FrameLayout>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_deviceInfoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="4dp"
+            app:cardElevation="10dp"
+            app:cardCornerRadius="20dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/card_bg_gradient"
+                android:padding="16dp">
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Conectado a:"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    android:textColor="#A9D6E5"
+                    />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cd_txtShow_BtDeviceName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Conectado a:"
+                    android:textSize="16sp"
+                    android:textStyle="italic|bold"
+                    android:textAlignment="textEnd"
+                    android:paddingEnd="8dp"
+                    android:textColor="#A9D6E5"
+                    tools:text="Device name"
+                    />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TAG UID:"
+                    android:layout_marginTop="12dp"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    android:textColor="#A9D6E5"
+                    />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cd_txtShow_TagUID"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="italic|bold"
+                    android:textAlignment="textEnd"
+                    android:paddingEnd="8dp"
+                    android:textColor="#A9D6E5"
+                    tools:text="UID Example"
+                    />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TAG Status:"
+                    android:layout_marginTop="12dp"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    android:textColor="#A9D6E5"
+                    />
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cd_txtShow_TagStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="italic|bold"
+                    android:textAlignment="textEnd"
+                    android:paddingEnd="8dp"
+                    android:textColor="#A9D6E5"
+                    tools:text="Tag status example"
+                    />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/lyt_buttons_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lyt_titleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cd_btnGetUID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="#468FAF"
+            android:text="Obtener UID"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/lyt_special_buttons_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lyt_buttons_container"
+        android:padding="12dp"
+        android:layout_marginTop="12dp"
+        >
+
+        <TableLayout
+            android:id="@+id/table_controls_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:stretchColumns="*">
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/cd_txtInput_KeyNumber"
+                    android:layout_height="48dp"
+                    android:layout_column="0"
+                    android:enabled="false"
+                    android:hint="Key ID"
+                    android:inputType="number"
+                    android:maxLength="1"
+                    android:textColor="#012A4A" />
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/cd_txtInput_KeyB64Value"
+                    android:layout_height="48dp"
+                    android:layout_column="1"
+                    android:layout_span="4"
+                    android:enabled="false"
+                    android:hint="Key Base64 Value"
+                    android:maxLength="16"
+                    android:textColor="#012A4A" />
+            </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <RadioGroup
+                    android:id="@+id/cd_radioBtnGroup_keys"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:layout_span="5">
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/cd_radioBtn_defaultKey"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="3"
+                        android:buttonTint="#A9D6E5"
+                        android:checked="true"
+                        android:text="LLave predeterminada" />
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/cd_radioBtn_settedKey"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="3"
+                        android:buttonTint="#A9D6E5"
+                        android:text="Llave personal" />
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/cd_radioBtn_newKey"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:buttonTint="#A9D6E5"
+                        android:text="Nueva Llave" />
+                </RadioGroup>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+                <RadioGroup
+                    android:id="@+id/cd_radioBtnGroup_files"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:layout_span="5">
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/cd_radioBtn_file01"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:text="Archivo 01"
+                        android:layout_weight="1"
+                        android:buttonTint="#A9D6E5"
+                        android:checked="true"
+                        />
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/cd_radioBtn_file02"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:buttonTint="#A9D6E5"
+                        android:text="Archivo 02" />
+
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/cd_radioBtn_file03"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:buttonTint="#A9D6E5"
+                        android:text="Archivo 03" />
+                </RadioGroup>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cd_txtShow_TagCommunicationResponse"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_span="5"
+                    tools:text="Respuestas"
+                    android:textSize="16sp"
+                    android:textAlignment="center"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    />
+            </TableRow>
+        </TableLayout>
+        <LinearLayout
+            android:id="@+id/lyt_control_buttons_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/cd_btnTryAuth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="#61A5C2"
+                android:text="Autenticar"
+                android:textColor="@color/white" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/cd_btnReadFile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="#89C2D9"
+                android:text="Leer Archivo"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

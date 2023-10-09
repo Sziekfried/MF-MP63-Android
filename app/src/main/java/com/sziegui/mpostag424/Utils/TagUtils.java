@@ -237,7 +237,6 @@ public class TagUtils {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
-
     }
 
     private byte[] concatByteArrays(byte[] byteArray1, byte[] byteArray2) {
@@ -272,7 +271,7 @@ public class TagUtils {
             throw new IllegalArgumentException("No se han creado las llaves de sesion");
         }
         byte[] commandToRead = new byte[]{
-                (byte) 0x90, (byte) 0xAD, (byte) 0x00, (byte) 0x00, (byte) 0x0F, idFile, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x30, (byte) 0x00, (byte) 0x00
+                (byte) 0x90, (byte) 0xAD, (byte) 0x00, (byte) 0x00, (byte) 0x0F, idFile, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x70, (byte) 0x00, (byte) 0x00
         };
         byte[] mac = getCMACt(commandToRead[1], new byte[]{(byte) 0x01, 0x00}, Arrays.copyOfRange(commandToRead, 5, 12));
         printLogTagCommand("MAC: " + Misc.hex2asc(mac));

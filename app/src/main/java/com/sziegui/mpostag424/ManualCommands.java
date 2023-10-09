@@ -1,17 +1,15 @@
 package com.sziegui.mpostag424;
 
+import static com.sziegui.mpostag424.Utils.Constants.CARD_POWER_OFF;
+import static com.sziegui.mpostag424.Utils.Constants.CARD_POWER_ON;
+import static com.sziegui.mpostag424.Utils.Constants.CARD_RF;
 import static com.sziegui.mpostag424.Utils.Constants.KEY04_TAG_JOSE;
 import static com.sziegui.mpostag424.Utils.Constants.TAG_APDU_GET_UID;
 import static com.sziegui.mpostag424.Utils.TagUtils.APDU_CMD_ISO_SELECT;
 import static com.sziegui.mpostag424.Utils.TagUtils.APDU_CMD_START_AUTH;
-import static com.sziegui.mpostag424.Utils.TagUtils.DEFAULT_424TAG_KEY;
-import static com.sziegui.mpostag424.Utils.TagUtils.LOG_TAG_COMMAND;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,26 +17,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+
 import com.mf.mpos.pub.Controler;
 import com.mf.mpos.util.Misc;
 import com.sziegui.mpostag424.Utils.TagUtils;
 import com.sziegui.mpostag424.Utils.UtilsUi;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class ManualCommands extends Fragment {
 
-    private final byte CARD_RF = 0x02;
-    private final byte CARD_POWER_ON = 0x01;
-    private final byte CARD_POWER_OFF = 0x02;
     private Button btnShowMessage, btnInitComm, btnEndComm, btnSendHexCommand, btnGetTagUID, btnTryAuth, btnReadFile;
     private TextView txtShowMPOSResponse, txtShowMPOSName, txtShowTagUID, txtShowAuthResult, txtShowTagFileData;
     private EditText txtInputMessage, txtInputCommand;
